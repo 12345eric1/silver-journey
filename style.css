@@ -17,7 +17,7 @@ body{
 }
 
 .game-wrap{
-  width:680px; /* container slightly wider than canvas */
+  width:720px; /* container slightly wider than canvas */
   max-width: calc(100vw - 40px);
   text-align:center;
 }
@@ -64,4 +64,5 @@ canvas{
 .uploader{display:flex;gap:8px;align-items:center;justify-content:center;margin-bottom:6px}
 .file-label input{margin-left:6px}
 .options{display:flex;gap:12px;align-items:center;justify-content:center}
+.sim-controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;margin-top:8px}
 .help{margin-top:6px;color:#9fb6c7;font-size:11px}

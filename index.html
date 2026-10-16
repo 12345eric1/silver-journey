@@ -18,9 +18,10 @@
 
     <div class="controls">
       <div class="uploader">
-        <label class="file-label">Upload fly brainmap (JSON array or CSV): <input id="fileInput" type="file" accept=".json,.csv" /></label>
+        <label class="file-label">Upload fly brainmap (JSON array, CSV timeseries, or connections CSV): <input id="fileInput" type="file" accept=".json,.csv" /></label>
         <button id="playPauseBtn" disabled>Play</button>
       </div>
+
       <div class="options">
         <label>Mapping:
           <select id="mappingSelect">
@@ -32,7 +33,22 @@
 
         <label>Playback rate: <input id="rate" type="range" min="1" max="200" value="50" /> <span id="rateVal">50</span> samples/sec</label>
       </div>
-      <div class="help">Files stay in your browser only. JSON example: [0.1,0.4,0.9,...] or CSV: one number per line.</div>
+
+      <div class="sim-controls">
+        <label><input id="autoFetch" type="checkbox" checked /> Try to load /connections_princeton.csv on page load</label>
+        <button id="simulateBtn">Simulate from connections</button>
+        <label>Neuron index (for single neuron view): <input id="neuronIdx" type="number" min="0" value="0" style="width:60px"/></label>
+        <label>Population mode: 
+          <select id="popMode">
+            <option value="mean">Mean</option>
+            <option value="pca">PCA</option>
+          </select>
+        </label>
+        <label>Sim steps: <input id="simSteps" type="number" min="10" value="2000" style="width:90px"/></label>
+        <label>Downsample to N neurons: <input id="downsampleN" type="number" min="1" value="200" style="width:90px"/></label>
+      </div>
+
+      <div class="help">Files stay in your browser only. JSON example: [0.1,0.4,0.9,...] or CSV timeseries: one number per line. Connections CSV can be a square adjacency matrix or edge list (src,tgt,weight).</div>
     </div>
   </div>
 
