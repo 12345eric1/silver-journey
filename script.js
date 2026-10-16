@@ -32,7 +32,7 @@
   let pointerLocked = false;
 
   // Playback state (time series)
-  const playback = { data: [], playing: false, rate: Number(rateEl.value), elapsedSamples: 0, index: 0 };
+  const playback = { data: [], playing: false, rate: Number(rateEl.value) || 20, elapsedSamples: 0, index: 0 };
 
   // Connection matrix (if loaded)
   let connMatrix = null; // Float32Array flattened row-major
@@ -46,23 +46,37 @@
   }
 
   function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function lerp(a, b, t) { return a + (b - a) * t; }
 
-  // Apply current playback sample according to mapping
-  function applySample(val) {
+  // Apply current playback sample according to mapping (with smoothing)
+  function applySample(val, dt) {
     if (!isFinite(val)) return;
     const mapping = mappingSelect.value;
     if (mapping === 'paddle') {
-      leftPaddle.y = clamp(val * (H_CAN - leftPaddle.h), 0, H_CAN - leftPaddle.h);
+      const targetY = clamp(val * (H_CAN - leftPaddle.h), 0, H_CAN - leftPaddle.h);
+      // smooth towards target using lerp and also cap max speed
+      const smoothT = clamp(8 * dt, 0, 1); // responsiveness
+      let desired = lerp(leftPaddle.y, targetY, smoothT);
+      const maxSpeed = 600; // px per second max
+      const maxDelta = maxSpeed * dt;
+      const delta = clamp(desired - leftPaddle.y, -maxDelta, maxDelta);
+      leftPaddle.y = clamp(leftPaddle.y + delta, 0, H_CAN - leftPaddle.h);
     } else if (mapping === 'ball') {
       const minFactor = 0.6, maxFactor = 2.0;
       const newSpeed = 3 * (minFactor + val * (maxFactor - minFactor));
+      // smooth speed change
+      const t = clamp(5 * dt, 0, 1);
+      ball.speed = lerp(ball.speed, newSpeed, t);
       const angle = Math.atan2(ball.vy, ball.vx || 1e-6);
-      ball.speed = newSpeed;
       ball.vx = (ball.vx >= 0 ? 1 : -1) * Math.abs(ball.speed * Math.cos(angle));
       ball.vy = ball.speed * Math.sin(angle);
     } else if (mapping === 'ai') {
       const target = val * (H_CAN - rightPaddle.h);
-      rightPaddle.y = clamp(rightPaddle.y * 0.85 + target * 0.15, 0, H_CAN - rightPaddle.h);
+      const smoothT = clamp(6 * dt, 0, 1);
+      let desired = lerp(rightPaddle.y, target, smoothT);
+      const maxSpeed = 500; const maxDelta = maxSpeed * dt;
+      const delta = clamp(desired - rightPaddle.y, -maxDelta, maxDelta);
+      rightPaddle.y = clamp(rightPaddle.y + delta, 0, H_CAN - rightPaddle.h);
     }
   }
 
@@ -70,20 +84,27 @@
   function update(now) {
     const dt = (now - lastFrame) / 1000; lastFrame = now;
 
-    // Playback advance
+    // Playback advance with interpolation between samples
     if (playback.playing && playback.data.length > 0) {
       playback.elapsedSamples += playback.rate * dt;
-      const idx = Math.floor(playback.elapsedSamples) % playback.data.length;
-      playback.index = idx;
-      const sample = playback.data[idx];
-      applySample(sample);
+      const len = playback.data.length;
+      // keep a floating index to interpolate smoothly
+      const floatIdx = playback.elapsedSamples % len;
+      const base = Math.floor(floatIdx);
+      const next = (base + 1) % len;
+      const frac = floatIdx - base;
+      const sample = lerp(playback.data[base], playback.data[next], frac);
+      playback.index = Math.floor(floatIdx);
+      applySample(sample, dt);
     }
 
     // Left paddle: pointer lock movement takes precedence, else keyboard/mouse
     if (pointerLocked) {
       // handled in mousemove
     } else if (mouseY !== null) {
-      leftPaddle.y = clamp(mouseY - leftPaddle.h / 2, 0, H_CAN - leftPaddle.h);
+      const target = clamp(mouseY - leftPaddle.h / 2, 0, H_CAN - leftPaddle.h);
+      // smooth keyboard/mouse control slightly
+      leftPaddle.y = lerp(leftPaddle.y, target, clamp(12 * dt, 0, 1));
     } else {
       if (keys.ArrowUp) leftPaddle.y = clamp(leftPaddle.y - paddle.speed, 0, H_CAN - leftPaddle.h);
       if (keys.ArrowDown) leftPaddle.y = clamp(leftPaddle.y + paddle.speed, 0, H_CAN - leftPaddle.h);
