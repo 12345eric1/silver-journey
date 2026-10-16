@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Pong</title>
+  <title>Pong — Fly Brainmap Playback</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -16,7 +16,24 @@
 
     <canvas id="gameCanvas" width="640" height="480"></canvas>
 
-    <div class="controls">Click the canvas to lock pointer. Use mouse movement or Arrow keys to control left paddle. Esc to release.</div>
+    <div class="controls">
+      <div class="uploader">
+        <label class="file-label">Upload fly brainmap (JSON array or CSV): <input id="fileInput" type="file" accept=".json,.csv" /></label>
+        <button id="playPauseBtn" disabled>Play</button>
+      </div>
+      <div class="options">
+        <label>Mapping:
+          <select id="mappingSelect">
+            <option value="paddle">Left paddle (position)</option>
+            <option value="ball">Ball speed</option>
+            <option value="ai">Right paddle (AI target)</option>
+          </select>
+        </label>
+
+        <label>Playback rate: <input id="rate" type="range" min="1" max="200" value="50" /> <span id="rateVal">50</span> samples/sec</label>
+      </div>
+      <div class="help">Files stay in your browser only. JSON example: [0.1,0.4,0.9,...] or CSV: one number per line.</div>
+    </div>
   </div>
 
   <script src="script.js"></script>
