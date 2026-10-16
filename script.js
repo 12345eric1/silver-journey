@@ -1,9 +1,12 @@
-// Simple Pong with pointer lock and minimal UI
+// Simple Pong with pointer lock and external scoreboard UI
 (() => {
   const canvas = document.getElementById('gameCanvas');
   const ctx = canvas.getContext('2d');
 
-  // Keep canvas logical size consistent
+  const scoreLeftEl = document.getElementById('leftScore');
+  const scoreRightEl = document.getElementById('rightScore');
+
+  // Logical canvas size from attributes
   const W = canvas.width;
   const H = canvas.height;
 
@@ -84,8 +87,8 @@
     }
 
     // Scoring
-    if (ball.x + ball.r < 0) { rightScore++; resetBall(true); }
-    else if (ball.x - ball.r > W) { leftScore++; resetBall(false); }
+    if (ball.x + ball.r < 0) { rightScore++; scoreRightEl.textContent = rightScore; resetBall(true); }
+    else if (ball.x - ball.r > W) { leftScore++; scoreLeftEl.textContent = leftScore; resetBall(false); }
   }
 
   function draw() {
@@ -106,16 +109,11 @@
     // ball
     ctx.beginPath(); ctx.fillStyle = '#ffffff'; ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2); ctx.fill(); ctx.closePath();
 
-    // scores (drawn on canvas)
-    ctx.fillStyle = 'rgba(255,255,255,0.9)';
-    ctx.font = '36px Arial'; ctx.textAlign = 'center';
-    ctx.fillText(leftScore, W * 0.25, 50);
-    ctx.fillText(rightScore, W * 0.75, 50);
-
     // hint when not pointer locked
     if (!pointerLocked) {
       ctx.font = '14px Arial'; ctx.fillStyle = 'rgba(159,182,199,0.9)';
-      ctx.fillText('Click to lock pointer. Use mouse movement or Arrow keys to control left paddle. Esc to release.', W/2, H - 20);
+      ctx.textAlign = 'center';
+      ctx.fillText('Click the canvas to lock pointer. Use mouse or Arrow keys to control left paddle.', W/2, H - 20);
     }
   }
 
@@ -138,7 +136,6 @@
   // Mouse movement: pointer lock uses movementY, otherwise use clientY
   canvas.addEventListener('mousemove', (e) => {
     if (pointerLocked) {
-      // movementY is the delta since last event
       leftPaddle.y = clamp(leftPaddle.y + e.movementY, 0, H - leftPaddle.h);
     } else {
       const rect = canvas.getBoundingClientRect();

@@ -16,13 +16,47 @@ body{
   justify-content:center;
 }
 
+.game-wrap{
+  width:680px; /* container slightly wider than canvas */
+  max-width: calc(100vw - 40px);
+  text-align:center;
+}
+
+.scoreboard{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:8px;
+  color:var(--text);
+}
+
+.score{
+  width:64px;
+  padding:6px 8px;
+  font-size:22px;
+  background:rgba(255,255,255,0.03);
+  border-radius:6px;
+}
+
+.center{
+  font-size:13px;
+  color:#9fb6c7;
+}
+
 canvas{
-  width:90vw;
-  max-width:1200px;
-  height:auto;
+  width:640px;
+  height:480px;
+  max-width:100%;
   background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
   border: 1px solid rgba(255,255,255,0.04);
   border-radius:6px;
   box-shadow: 0 6px 30px rgba(2,6,23,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
   display:block;
+  margin:0 auto;
+}
+
+.controls{
+  margin-top:8px;
+  font-size:12px;
+  color:#9fb6c7;
 }

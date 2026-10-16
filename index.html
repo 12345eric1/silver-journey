@@ -7,7 +7,18 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <canvas id="gameCanvas" width="800" height="600"></canvas>
+  <div class="game-wrap">
+    <div class="scoreboard">
+      <div id="leftScore" class="score">0</div>
+      <div class="center">PONG</div>
+      <div id="rightScore" class="score">0</div>
+    </div>
+
+    <canvas id="gameCanvas" width="640" height="480"></canvas>
+
+    <div class="controls">Click the canvas to lock pointer. Use mouse movement or Arrow keys to control left paddle. Esc to release.</div>
+  </div>
+
   <script src="script.js"></script>
 </body>
 </html>
